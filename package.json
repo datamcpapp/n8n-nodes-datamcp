@@ -24,7 +24,8 @@
     "dev": "n8n-node dev",
     "typecheck": "tsc --noEmit",
     "lint": "n8n-node lint",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "test:package": "node test/package-check.js"
   },
   "files": ["dist"],
   "n8n": {
