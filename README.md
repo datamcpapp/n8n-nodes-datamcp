@@ -7,11 +7,11 @@ the tunnel is a routing choice in DataMCP, not a second n8n node.
 
 **Setup guide:** [Credentials and operations](#credential-setup)
 
-## Release status
+## Installation
 
-This package is not published to npm and is not available in the n8n
-marketplace. Public installation is not available yet. Do not use an
-`npx install` command; n8n does not provide one.
+When this package is available on npm, install `n8n-nodes-datamcp` through
+n8n's Community Nodes settings. Before publication, use the local preview
+below. Do not use an `npx install` command; n8n does not provide one.
 
 People who receive this source package from DataMCP can run the verified local
 preview:
@@ -83,8 +83,8 @@ row larger than 512 KiB is rejected rather than silently cut in half.
 
 ### Create Row, Update Row, and Delete Row
 
-Row mutations are enabled and live-tested on QA, but are disabled in
-production. Choose up to 20 schema-qualified tables in one source, then grant
+Row mutations require integration writes to be enabled in your DataMCP
+environment. Choose up to 20 schema-qualified tables in one source, then grant
 only the Create, Update, and Delete actions the workflow needs. A write
 credential may also allow Read Query. Read Query can reach any table covered
 by the database user's SELECT grants in that source; selecting write tables
@@ -111,8 +111,9 @@ QA n8n 2.44.6 has exercised direct hosted PostgreSQL and Local Agent Tunnel:
 bounded 25,000-row reads, CTE/window queries, bound parameters, create/update/
 delete, zero-row updates, read-only and cross-source denials, paused sources,
 offline/recovered agents, and oversized result rows. Key revocation returned
-401 immediately in a running n8n workflow. A workflow in a disposable QA
-organization without an active plan received HTTP 402. A QA rate-limit burst
+401 immediately in a running n8n workflow. Temporarily canceling and then
+restoring a QA test subscription produced a 402 denial followed by a
+successful read after the entitlement cache expired. A QA rate-limit burst
 returned HTTP 429, which a running n8n workflow displayed as a safe rate-limit
 error. The packed archive was checked separately from the source checkout.
 
