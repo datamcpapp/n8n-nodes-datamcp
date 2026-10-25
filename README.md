@@ -70,6 +70,18 @@ Reads return at most 100 rows and 512 KiB. Each result row becomes one n8n item
 with `row`, `columns`, `values`, `rowCount`, `truncated`, and `sourceId`. An
 empty result emits one item with `row: null`.
 
+For larger tables, page by a stable unique key rather than increasing OFFSET:
+
+```sql
+SELECT id, label FROM public.orders WHERE id > $1 ORDER BY id LIMIT 100
+```
+
+Start with a bound parameter of `0` for a positive identity key, then pass the
+last returned ID into the next request. Stop when a page is empty. If a query
+already contains `LIMIT 100`, `truncated: false` does not prove that the table
+has no later rows. Narrow wide rows with an explicit column list; a single
+row larger than 512 KiB is rejected rather than silently cut in half.
+
 ### Create Row, Update Row, and Delete Row
 
 Row mutations are enabled and live-tested on QA, but are disabled in
