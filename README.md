@@ -5,8 +5,7 @@ from n8n. Private PostgreSQL sources can be reached through Local Agent Tunnel.
 The n8n action is **DataMCP Database** for both direct and tunneled sources;
 the tunnel is a routing choice in DataMCP, not a second n8n node.
 
-**User guide:**
-[Connect n8n to PostgreSQL with DataMCP](https://dashboard.datamcp.app/docs/n8n)
+**Setup guide:** [Credentials and operations](#credential-setup)
 
 ## Release status
 

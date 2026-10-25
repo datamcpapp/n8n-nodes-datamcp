@@ -13,7 +13,7 @@ export class DataMcpApi implements ICredentialType {
     light: 'file:../nodes/DataMcp/datamcp-brand.svg',
     dark: 'file:../nodes/DataMcp/datamcp-brand.svg',
   };
-  documentationUrl = 'https://dashboard.datamcp.app/docs/n8n';
+  documentationUrl = 'https://github.com/datamcpapp/n8n-nodes-datamcp#credential-setup';
 
   properties: INodeProperties[] = [
     {
