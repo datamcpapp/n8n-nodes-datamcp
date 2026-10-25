@@ -12,14 +12,14 @@ import { apiBaseUrl, parseQueryParameters, parseRowObject, queryOutput, readMuta
 
 export class DataMcp implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'DataMCP',
+    displayName: 'DataMCP Database',
     name: 'dataMcp',
     icon: { light: 'file:datamcp-brand.svg', dark: 'file:datamcp-brand.svg' },
     group: ['input'],
     version: 1,
     description: 'Read and change rows in a DataMCP database source',
     subtitle: '={{$parameter["operation"]}}',
-    defaults: { name: 'DataMCP' },
+    defaults: { name: 'DataMCP Database' },
     inputs: [NodeConnectionTypes.Main],
     outputs: [NodeConnectionTypes.Main],
     usableAsTool: true,
