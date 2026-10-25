@@ -94,13 +94,18 @@ schema must be synchronized before the source can be used.
 
 ## Current release checks
 
+QA n8n 2.44.6 has exercised direct hosted PostgreSQL and Local Agent Tunnel:
+bounded 25,000-row reads, CTE/window queries, bound parameters, create/update/
+delete, zero-row updates, read-only and cross-source denials, paused sources,
+offline/recovered agents, and oversized result rows. Key revocation returned
+401 immediately in the live Integration API.
+
 Do not publish this package before completing:
 
 - production migration and write-feature review;
-- credential revocation and source-pause checks in a running n8n workflow;
+- credential revocation in a running n8n workflow;
 - live HTTP 402 and 429 workflow checks;
-- a live n8n workflow using bound parameters;
-- packaging from a public repository and marketplace submission.
+- production-backed regression and npm publication/scan.
 
 The QA credentials and disposable databases used during development are test
 fixtures and must never be included in this package.
