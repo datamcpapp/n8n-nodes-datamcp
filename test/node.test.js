@@ -54,6 +54,53 @@ test('the source dropdown excludes sources without read-query permission', async
   assert.deepEqual(options, [{ name: 'Database (database)', value: 'conn_database' }]);
 });
 
+test('the source dropdown only offers sources authorized for the selected write action', async () => {
+  const requests = [];
+  const context = {
+    getCredentials: async () => ({ environment: 'qa' }),
+    getCurrentNodeParameter: () => 'deleteRow',
+    getNode: () => ({ name: 'DataMCP', type: 'dataMcp' }),
+    helpers: {
+      httpRequestWithAuthentication: async (credentialType, request) => {
+        requests.push({ credentialType, request });
+        return {
+          success: true,
+          data: [
+            { id: 'conn_read', name: 'Reader', type: 'database', operations: ['read_query'] },
+            { id: 'conn_create', name: 'Creator', type: 'database', operations: ['create_row'] },
+            { id: 'conn_delete', name: 'Deleter', type: 'database', operations: ['delete_row'] },
+          ],
+        };
+      },
+    },
+  };
+  const options = await new DataMcp().methods.loadOptions.getSources.call(context);
+  assert.deepEqual(options, [{ name: 'Deleter (database)', value: 'conn_delete' }]);
+  assert.equal(requests[0].credentialType, 'dataMcpApi');
+  assert.equal(requests[0].request.url, 'https://api-qa.datamcp.app/api/integrations/v1/sources');
+});
+
+test('an empty read still emits one paired item for downstream workflow steps', async () => {
+  const context = {
+    getInputData: () => [{ json: { id: 7 } }],
+    getCredentials: async () => ({ environment: 'qa' }),
+    getNodeParameter: (name) => ({ sourceId: 'conn_private', query: 'SELECT id FROM private_probe WHERE id = 7', maxRows: 10 })[name],
+    getNode: () => ({ name: 'DataMCP', type: 'dataMcp' }),
+    continueOnFail: () => false,
+    helpers: {
+      httpRequestWithAuthentication: async () => ({
+        success: true,
+        data: { columns: ['id'], rows: [], rowCount: 0, truncated: false },
+      }),
+    },
+  };
+  const result = await new DataMcp().execute.call(context);
+  assert.deepEqual(result, [[{
+    json: { sourceId: 'conn_private', columns: ['id'], values: null, row: null, rowCount: 0, truncated: false },
+    pairedItem: { item: 0 },
+  }]]);
+});
+
 test('the node binds query parameters without interpolating them into SQL', async () => {
   const requests = [];
   const context = {
@@ -110,6 +157,26 @@ test('row actions use scoped methods and emit affected row counts', async () => 
     assert.equal(requests[0].body.table, 'public.private_probe');
     assert.deepEqual(result[0][0].json, { sourceId: 'conn_private', table: 'public.private_probe', operation, affectedRows: 1 });
   }
+});
+
+test('invalid row values are rejected before any network request', async () => {
+  let requests = 0;
+  const context = {
+    getInputData: () => [{ json: { id: 7 } }],
+    getCredentials: async () => ({ environment: 'qa' }),
+    getNodeParameter: (name) => ({
+      operation: 'updateRow',
+      sourceId: 'conn_private',
+      table: 'public.private_probe',
+      rowValues: '{"label":{"nested":"not allowed"}}',
+      primaryKey: '{"id":7}',
+    })[name],
+    getNode: () => ({ name: 'DataMCP', type: 'dataMcp' }),
+    continueOnFail: () => false,
+    helpers: { httpRequestWithAuthentication: async () => { requests++; } },
+  };
+  await assert.rejects(new DataMcp().execute.call(context), /values contains unsupported fields or values/);
+  assert.equal(requests, 0);
 });
 
 test('continue on fail emits a safe error without query or credential details', async () => {
