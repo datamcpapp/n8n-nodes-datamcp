@@ -32,7 +32,9 @@ The published package has also been loaded with n8n 2.44.6.
 
 1. Create the database source in DataMCP.
 2. Open **API Keys → Integration keys** in the DataMCP dashboard.
-3. Create a read-only key limited to only the source(s) the workflow needs.
+3. Create a read-only key for the source(s) the workflow needs, or choose
+   **Write selected tables** and grant only the specific tables and actions
+   needed for row mutations.
 4. Copy the `dm_int_` secret immediately; it is shown once.
 5. In n8n, create **DataMCP Integration API**, choose QA or Production, and
    paste the secret.
@@ -72,9 +74,9 @@ row larger than 512 KiB is rejected rather than silently cut in half.
 
 ### Create Row, Update Row, and Delete Row
 
-Row mutations are currently enabled in QA but disabled in production. They
-require integration writes to be enabled in your DataMCP environment. Choose
-up to 20 schema-qualified tables in one source, then grant
+Row mutations are available in QA and production when integration writes are
+enabled in the DataMCP environment. Choose up to 20 schema-qualified tables
+in one source, then grant
 only the Create, Update, and Delete actions the workflow needs. A write
 credential may also allow Read Query. Read Query can reach any table covered
 by the database user's SELECT grants in that source; selecting write tables
@@ -108,9 +110,14 @@ returned HTTP 429, which a running n8n workflow displayed as a safe rate-limit
 error. The packed archive was checked separately from the source checkout.
 
 Production Read Query was verified with a source-scoped key and `SELECT 1`;
-the key was revoked after the test. Production row mutations have not yet been
-enabled or verified. Version 0.1.0 was published manually, but did not include
-provenance and therefore did not pass the n8n community-package scanner.
+the key was revoked after the test. Production create/read/update/delete was
+also verified against a disposable PostgreSQL table through Local Agent
+Tunnel using the published 0.1.1 node code in a local n8n container. The test
+also confirmed cross-table writes and write SQL through Read Query are denied,
+and that revoking the key immediately blocks further requests. The test key,
+tunnel, table, and database role were removed afterward. Version 0.1.0 was
+published manually, but did not include provenance and therefore did not pass
+the n8n community-package scanner.
 
 The QA credentials and disposable databases used during development are test
 fixtures and must never be included in this package.
