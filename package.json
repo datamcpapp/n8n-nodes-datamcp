@@ -1,0 +1,45 @@
+{
+  "name": "n8n-nodes-datamcp",
+  "version": "0.1.0",
+  "description": "Source-scoped DataMCP actions for n8n",
+  "license": "MIT",
+  "homepage": "https://datamcp.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/datamcpapp/n8n-nodes-datamcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/datamcpapp/n8n-nodes-datamcp/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "Andrei Mironov",
+    "email": "hello@datamcp.app"
+  },
+  "keywords": ["n8n-community-node-package"],
+  "scripts": {
+    "build": "n8n-node build",
+    "dev": "n8n-node dev",
+    "typecheck": "tsc --noEmit",
+    "lint": "n8n-node lint",
+    "test": "node --test test/*.test.js",
+    "test:package": "node test/package-check.js"
+  },
+  "files": ["dist"],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "strict": true,
+    "credentials": ["dist/credentials/DataMcpApi.credentials.js"],
+    "nodes": ["dist/nodes/DataMcp/DataMcp.node.js"]
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "0.53.4",
+    "n8n-workflow": "2.16.0",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
