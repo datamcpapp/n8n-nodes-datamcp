@@ -34,16 +34,17 @@ the n8n user folder:
 # In this package directory
 npm install
 npm run build
-npm pack
+npm pack --silent
 
 # On the self-hosted n8n machine
 mkdir -p ~/.n8n/nodes
 cd ~/.n8n/nodes
-npm install /absolute/path/to/n8n-nodes-datamcp-0.1.0.tgz
+npm install /absolute/path/to/the-copied-package.tgz
 ```
 
-Restart n8n after installation. n8n Cloud cannot load this unpublished local
-package.
+Copy the archive whose filename `npm pack` prints to the n8n machine, then
+replace the example path. Restart n8n after installation. n8n Cloud cannot
+load this unpublished local package.
 
 ## Credential setup
 
