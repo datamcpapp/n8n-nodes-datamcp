@@ -9,12 +9,13 @@ the tunnel is a routing choice in DataMCP, not a second n8n node.
 
 ## Installation
 
-When this package is available on npm, install `n8n-nodes-datamcp` through
-n8n's Community Nodes settings. Before publication, use the local preview
-below. Do not use an `npx install` command; n8n does not provide one.
+On self-hosted n8n, open **Settings → Community Nodes**, select **Install a
+community node**, and enter `n8n-nodes-datamcp`. Restart n8n if the node does
+not appear immediately. n8n Cloud availability depends on n8n's verification
+and rollout of the package. Do not use an `npx install` command; n8n does not
+provide one.
 
-People who receive this source package from DataMCP can run the verified local
-preview:
+To develop the node from source, run:
 
 ```bash
 cd n8n-nodes-datamcp
@@ -24,33 +25,14 @@ npm test
 npm run dev
 ```
 
-The final command opens a local n8n editor with the DataMCP node installed. The
-package has been loaded with n8n 2.44.6.
-
-For a self-hosted n8n instance, build a supplied archive and install it into
-the n8n user folder:
-
-```bash
-# In this package directory
-npm install
-npm run build
-npm pack --silent
-
-# On the self-hosted n8n machine
-mkdir -p ~/.n8n/nodes
-cd ~/.n8n/nodes
-npm install /absolute/path/to/the-copied-package.tgz
-```
-
-Copy the archive whose filename `npm pack` prints to the n8n machine, then
-replace the example path. Restart n8n after installation. n8n Cloud cannot
-load this unpublished local package.
+The final command opens a local n8n editor with the DataMCP node installed.
+The published package has also been loaded with n8n 2.44.6.
 
 ## Credential setup
 
 1. Create the database source in DataMCP.
-2. Open **API Keys → Integration credentials** in the DataMCP dashboard.
-3. Create a read credential limited to only the source(s) the workflow needs.
+2. Open **API Keys → Integration keys** in the DataMCP dashboard.
+3. Create a read-only key limited to only the source(s) the workflow needs.
 4. Copy the `dm_int_` secret immediately; it is shown once.
 5. In n8n, create **DataMCP Integration API**, choose QA or Production, and
    paste the secret.
@@ -68,10 +50,9 @@ credential reference, or database address embedded in it.
 
 ### Read Query
 
-Read Query is available in QA. Production requires the Integration API rollout
-before this credential and action can work there. The operation accepts
-read-only SQL and an optional JSON array of bound values. Use `$1`, `$2`, and
-so on for PostgreSQL, or `?` for MySQL. Values are sent separately from SQL.
+Read Query is available in QA and production. The operation accepts read-only
+SQL and an optional JSON array of bound values. Use `$1`, `$2`, and so on for
+PostgreSQL, or `?` for MySQL. Values are sent separately from SQL.
 
 Reads return at most 100 rows and 512 KiB. Each result row becomes one n8n item
 with `row`, `columns`, `values`, `rowCount`, `truncated`, and `sourceId`. An
@@ -91,8 +72,9 @@ row larger than 512 KiB is rejected rather than silently cut in half.
 
 ### Create Row, Update Row, and Delete Row
 
-Row mutations require integration writes to be enabled in your DataMCP
-environment. Choose up to 20 schema-qualified tables in one source, then grant
+Row mutations are currently enabled in QA but disabled in production. They
+require integration writes to be enabled in your DataMCP environment. Choose
+up to 20 schema-qualified tables in one source, then grant
 only the Create, Update, and Delete actions the workflow needs. A write
 credential may also allow Read Query. Read Query can reach any table covered
 by the database user's SELECT grants in that source; selecting write tables
@@ -125,22 +107,22 @@ successful read after the entitlement cache expired. A QA rate-limit burst
 returned HTTP 429, which a running n8n workflow displayed as a safe rate-limit
 error. The packed archive was checked separately from the source checkout.
 
-Do not publish this package before completing:
-
-- production migration and write-feature review;
-- production-backed regression and npm publication/scan.
+Production Read Query was verified with a source-scoped key and `SELECT 1`;
+the key was revoked after the test. Production row mutations have not yet been
+enabled or verified. Version 0.1.0 was published manually, but did not include
+provenance and therefore did not pass the n8n community-package scanner.
 
 The QA credentials and disposable databases used during development are test
 fixtures and must never be included in this package.
 
 ## Publishing checklist
 
-The package must live in a public GitHub repository before submission. Its
-`v*.*.*` tag runs CI and publishes to npm from GitHub Actions with provenance.
-The npm package must trust this repository's `publish.yml` workflow, or the
-repository must have a narrowly scoped `NPM_TOKEN` secret for the first publish.
-Do not tag a release until the QA checks above pass and production supports
-every operation advertised by the node. After publication, run n8n's
-`@n8n/scan-community-package` check against the published package version and
-submit through the n8n Creator Portal. The scanner resolves npm packages; it
-cannot validate an unpublished local directory.
+The `v*.*.*` tag runs CI and stages the package from GitHub Actions with
+provenance. Configure npm trusted publishing with stage-only permission for the
+public `datamcpapp/n8n-nodes-datamcp` repository and `publish.yml` workflow
+before tagging a new version. Do not tag until the matching version is merged
+to main and CI passes. A maintainer must review and approve the staged package
+with 2FA before it becomes public. After approval, run n8n's
+`@n8n/scan-community-package` against the published version and submit through
+the n8n Creator Portal only after it passes. The scanner resolves npm packages;
+it cannot validate an unpublished local directory.
