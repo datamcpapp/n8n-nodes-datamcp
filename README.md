@@ -58,6 +58,12 @@ load this unpublished local package.
 Do not use a workspace `sk_live_` API key. Workspace keys have broader access.
 An Integration credential is restricted to selected sources and operations.
 
+To try a first read, import the
+[example workflow](https://github.com/datamcpapp/n8n-nodes-datamcp/blob/main/examples/read-query.json)
+into n8n. Select your saved Integration credential and a permitted database
+source in the DataMCP Database node, then execute it. The example has no key,
+credential reference, or database address embedded in it.
+
 ## Operations
 
 ### Read Query

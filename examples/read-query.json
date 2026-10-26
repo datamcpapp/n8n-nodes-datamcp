@@ -1,0 +1,43 @@
+{
+  "name": "DataMCP Database - First Read",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "a2c2d7b2-7c4a-4f2e-9e93-6f94f4a5b7e9",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "readQuery",
+        "sourceId": "",
+        "query": "SELECT 1 AS connected",
+        "maxRows": 1
+      },
+      "type": "n8n-nodes-datamcp.dataMcp",
+      "typeVersion": 1,
+      "position": [224, 0],
+      "id": "d99e1f17-13fc-4a3b-bfe3-a32640a8295d",
+      "name": "DataMCP Database"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "DataMCP Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}
