@@ -31,11 +31,5 @@ jobs:
       - run: npm run test:package
       - name: Check tag matches package version
         run: test "${GITHUB_REF_NAME#v}" = "$(node -p 'require("./package.json").version')"
-      - name: Publish with provenance
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          if [ -n "$NPM_TOKEN" ]; then
-            npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
-          fi
-          npm publish --provenance --access public
+      - name: Stage release with provenance
+        run: npm stage publish --provenance --access public

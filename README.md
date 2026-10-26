@@ -117,11 +117,12 @@ fixtures and must never be included in this package.
 
 ## Publishing checklist
 
-The `v*.*.*` tag runs CI and publishes to npm from GitHub Actions with
-provenance. Configure npm trusted publishing for the public
-`datamcpapp/n8n-nodes-datamcp` repository and `publish.yml` workflow before
-tagging a new version. Do not tag until the matching version is merged to main
-and CI passes. After publication, run n8n's `@n8n/scan-community-package`
-against the published version and submit through the n8n Creator Portal only
-after it passes. The scanner resolves npm packages; it cannot validate an
-unpublished local directory.
+The `v*.*.*` tag runs CI and stages the package from GitHub Actions with
+provenance. Configure npm trusted publishing with stage-only permission for the
+public `datamcpapp/n8n-nodes-datamcp` repository and `publish.yml` workflow
+before tagging a new version. Do not tag until the matching version is merged
+to main and CI passes. A maintainer must review and approve the staged package
+with 2FA before it becomes public. After approval, run n8n's
+`@n8n/scan-community-package` against the published version and submit through
+the n8n Creator Portal only after it passes. The scanner resolves npm packages;
+it cannot validate an unpublished local directory.
