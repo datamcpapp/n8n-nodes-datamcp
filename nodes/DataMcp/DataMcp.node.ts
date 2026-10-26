@@ -146,9 +146,10 @@ export class DataMcp implements INodeType {
     const baseUrl = apiBaseUrl(credentials.environment);
 
     for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
+      let operation = 'readQuery';
       try {
         const sourceId = this.getNodeParameter('sourceId', itemIndex) as string;
-        const operation = (this.getNodeParameter('operation', itemIndex, 'readQuery') as string | undefined) ?? 'readQuery';
+        operation = (this.getNodeParameter('operation', itemIndex, 'readQuery') as string | undefined) ?? 'readQuery';
         if (!/^conn_[A-Za-z0-9_-]{1,100}$/.test(sourceId)) {
           throw new NodeOperationError(this.getNode(), 'Select a valid DataMCP source', {
             itemIndex,
@@ -220,7 +221,7 @@ export class DataMcp implements INodeType {
         const message =
           error instanceof NodeOperationError
             ? error.message
-            : safeRequestError(error);
+            : safeRequestError(error, operation !== 'readQuery');
         if (this.continueOnFail()) {
           output.push({ json: { error: message }, pairedItem: { item: itemIndex } });
           continue;

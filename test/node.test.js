@@ -248,6 +248,32 @@ test('continue on fail emits a safe error without query or credential details', 
   }]]);
 });
 
+test('write timeout warns that a mutation may have succeeded', async () => {
+  const context = {
+    getInputData: () => [{ json: { label: 'new' } }],
+    getCredentials: async () => ({ environment: 'qa' }),
+    getNodeParameter: (name) => ({
+      operation: 'createRow',
+      sourceId: 'conn_private',
+      table: 'public.private_probe',
+      rowValues: '{"label":"new"}',
+    })[name],
+    getNode: () => ({ name: 'DataMCP', type: 'dataMcp' }),
+    continueOnFail: () => true,
+    helpers: {
+      httpRequestWithAuthentication: async () => {
+        throw { response: { statusCode: 504 }, message: 'dm_int_secret private row' };
+      },
+    },
+  };
+
+  const result = await new DataMcp().execute.call(context);
+  assert.deepEqual(result, [[{
+    json: { error: 'Write outcome is unknown. Check the row before retrying' },
+    pairedItem: { item: 0 },
+  }]]);
+});
+
 test('multiple input items keep their pairing when one request fails', async () => {
   const context = {
     getInputData: () => [{ json: { id: 1 } }, { json: { id: 2 } }],

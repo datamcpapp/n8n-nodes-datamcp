@@ -79,4 +79,7 @@ test('request errors never expose tokens or SQL text', () => {
   assert.equal(safeRequestError({ httpCode: '503', message: 'postgres://readonly:password@private' }), 'DataMCP source is unavailable. If it uses a tunnel, check that the Local Agent is running');
   assert.equal(safeRequestError({ status: 504, message: 'SELECT secret FROM private' }), 'DataMCP query timed out');
   assert.equal(safeRequestError(new Error('dm_int_secret SELECT * FROM private')), 'DataMCP request failed');
+  assert.equal(safeRequestError({ status: 504, message: 'dm_int_secret' }, true), 'Write outcome is unknown. Check the row before retrying');
+  assert.equal(safeRequestError({ status: 503, message: 'postgres://private' }, true), 'Write outcome is unknown. Check the row and Local Agent before retrying');
+  assert.equal(safeRequestError(new Error('dm_int_secret'), true), 'Write outcome is unknown. Check the row before retrying');
 });

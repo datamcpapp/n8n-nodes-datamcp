@@ -155,7 +155,7 @@ export function queryOutput(
   });
 }
 
-export function safeRequestError(error: unknown): string {
+export function safeRequestError(error: unknown, write = false): string {
   const response = isRecord(error) && isRecord(error.response) ? error.response : undefined;
   const status = response?.statusCode ?? response?.status ??
     (isRecord(error) ? error.statusCode ?? error.status ?? error.httpCode : undefined);
@@ -179,11 +179,13 @@ export function safeRequestError(error: unknown): string {
     case 500:
       return 'DataMCP request failed. Check data before retrying a write';
     case 503:
-      return 'DataMCP source is unavailable. If it uses a tunnel, check that the Local Agent is running';
+      return write
+        ? 'Write outcome is unknown. Check the row and Local Agent before retrying'
+        : 'DataMCP source is unavailable. If it uses a tunnel, check that the Local Agent is running';
     case 504:
-      return 'DataMCP query timed out';
+      return write ? 'Write outcome is unknown. Check the row before retrying' : 'DataMCP query timed out';
     default:
-      return 'DataMCP request failed';
+      return write ? 'Write outcome is unknown. Check the row before retrying' : 'DataMCP request failed';
   }
 }
 
