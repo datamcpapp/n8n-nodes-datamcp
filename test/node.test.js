@@ -129,6 +129,39 @@ test('the node binds query parameters without interpolating them into SQL', asyn
   });
 });
 
+test('MySQL placeholders and Unicode parameters remain bound values', async () => {
+  const requests = [];
+  const context = {
+    getInputData: () => [{ json: { label: '試験' } }],
+    getCredentials: async () => ({ environment: 'qa' }),
+    getNodeParameter: (name) => ({
+      sourceId: 'conn_mysql',
+      query: 'SELECT id, label FROM sample WHERE label = ? AND id > ?',
+      queryParameters: '["試験",0]',
+      maxRows: 10,
+    })[name],
+    getNode: () => ({ name: 'DataMCP', type: 'dataMcp' }),
+    continueOnFail: () => false,
+    helpers: {
+      httpRequestWithAuthentication: async (_credentialType, request) => {
+        requests.push(request);
+        return {
+          success: true,
+          data: { columns: ['id', 'label'], rows: [[1, '試験']], rowCount: 1, truncated: false },
+        };
+      },
+    },
+  };
+
+  const result = await new DataMcp().execute.call(context);
+  assert.deepEqual(requests[0].body, {
+    query: 'SELECT id, label FROM sample WHERE label = ? AND id > ?',
+    maxRows: 10,
+    parameters: ['試験', 0],
+  });
+  assert.deepEqual(result[0][0].json.row, { id: 1, label: '試験' });
+});
+
 test('row actions use scoped methods and emit affected row counts', async () => {
   for (const [operation, method] of [['createRow', 'POST'], ['updateRow', 'PATCH'], ['deleteRow', 'DELETE']]) {
     const requests = [];
