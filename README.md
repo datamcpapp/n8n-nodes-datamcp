@@ -62,9 +62,10 @@ An Integration credential is restricted to selected sources and operations.
 
 ### Read Query
 
-Read Query is available in QA and production. It accepts read-only SQL and an
-optional JSON array of bound values. Use `$1`, `$2`, and so on for PostgreSQL,
-or `?` for MySQL. Values are sent separately from SQL.
+Read Query is available in QA. Production requires the Integration API rollout
+before this credential and action can work there. The operation accepts
+read-only SQL and an optional JSON array of bound values. Use `$1`, `$2`, and
+so on for PostgreSQL, or `?` for MySQL. Values are sent separately from SQL.
 
 Reads return at most 100 rows and 512 KiB. Each result row becomes one n8n item
 with `row`, `columns`, `values`, `rowCount`, `truncated`, and `sourceId`. An
