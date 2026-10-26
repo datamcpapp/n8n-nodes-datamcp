@@ -51,6 +51,8 @@ export class DataMcpApi implements ICredentialType {
     request: {
       url: "={{$credentials.environment === 'qa' ? 'https://api-qa.datamcp.app/api/integrations/v1/sources' : 'https://api.datamcp.app/api/integrations/v1/sources'}}",
       method: 'GET',
+      disableFollowRedirect: true,
+      sendCredentialsOnCrossOriginRedirect: false,
     },
   };
 }

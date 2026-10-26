@@ -120,6 +120,8 @@ export class DataMcp implements INodeType {
               method: 'GET',
               url: `${apiBaseUrl(credentials.environment)}/integrations/v1/sources`,
               json: true,
+              disableFollowRedirect: true,
+              sendCredentialsOnCrossOriginRedirect: false,
             },
           );
           const operation = this.getCurrentNodeParameter?.('operation') as string | undefined;
@@ -172,6 +174,8 @@ export class DataMcp implements INodeType {
               url: `${baseUrl}/integrations/v1/sources/${encodeURIComponent(sourceId)}/query`,
               body: parameters.length > 0 ? { query, maxRows, parameters } : { query, maxRows },
               json: true,
+              disableFollowRedirect: true,
+              sendCredentialsOnCrossOriginRedirect: false,
             },
           );
           const result = readQueryResult(response);
@@ -203,6 +207,8 @@ export class DataMcp implements INodeType {
               url: `${baseUrl}/integrations/v1/sources/${encodeURIComponent(sourceId)}/rows`,
               body,
               json: true,
+              disableFollowRedirect: true,
+              sendCredentialsOnCrossOriginRedirect: false,
             },
           );
           output.push({

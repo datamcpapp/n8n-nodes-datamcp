@@ -1,6 +1,13 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 const { DataMcp } = require('../dist/nodes/DataMcp/DataMcp.node');
+const { DataMcpApi } = require('../dist/credentials/DataMcpApi.credentials');
+
+test('credential checks and node requests never forward the integration key across redirects', () => {
+  const credentialRequest = new DataMcpApi().test.request;
+  assert.equal(credentialRequest.disableFollowRedirect, true);
+  assert.equal(credentialRequest.sendCredentialsOnCrossOriginRedirect, false);
+});
 
 test('the node sends a scoped read query and emits paired row items', async () => {
   const requests = [];
@@ -29,6 +36,8 @@ test('the node sends a scoped read query and emits paired row items', async () =
       url: 'https://api-qa.datamcp.app/api/integrations/v1/sources/conn_private/query',
       body: { query: 'SELECT id FROM private_probe', maxRows: 25 },
       json: true,
+      disableFollowRedirect: true,
+      sendCredentialsOnCrossOriginRedirect: false,
     },
   }]);
   assert.deepEqual(result, [[
@@ -78,6 +87,8 @@ test('the source dropdown only offers sources authorized for the selected write 
   assert.deepEqual(options, [{ name: 'Deleter (database)', value: 'conn_delete' }]);
   assert.equal(requests[0].credentialType, 'dataMcpApi');
   assert.equal(requests[0].request.url, 'https://api-qa.datamcp.app/api/integrations/v1/sources');
+  assert.equal(requests[0].request.disableFollowRedirect, true);
+  assert.equal(requests[0].request.sendCredentialsOnCrossOriginRedirect, false);
 });
 
 test('an empty read still emits one paired item for downstream workflow steps', async () => {
@@ -127,6 +138,8 @@ test('the node binds query parameters without interpolating them into SQL', asyn
     maxRows: 1,
     parameters: [7],
   });
+  assert.equal(requests[0].disableFollowRedirect, true);
+  assert.equal(requests[0].sendCredentialsOnCrossOriginRedirect, false);
 });
 
 test('MySQL placeholders and Unicode parameters remain bound values', async () => {
@@ -188,6 +201,8 @@ test('row actions use scoped methods and emit affected row counts', async () => 
     assert.equal(requests[0].method, method);
     assert.equal(requests[0].url, 'https://api-qa.datamcp.app/api/integrations/v1/sources/conn_private/rows');
     assert.equal(requests[0].body.table, 'public.private_probe');
+    assert.equal(requests[0].disableFollowRedirect, true);
+    assert.equal(requests[0].sendCredentialsOnCrossOriginRedirect, false);
     assert.deepEqual(result[0][0].json, { sourceId: 'conn_private', table: 'public.private_probe', operation, affectedRows: 1 });
   }
 });
